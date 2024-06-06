@@ -31,7 +31,10 @@ const tareas = [
 
 const crearTarea = async (tarea) => {
     // enviar consulta a la API para crear una tarea
-    alert('tarea creada')
+    //alert('tarea creada')
+
+    tarea.estado = 'inactiva'
+    tareas.push(tarea)
 }
 
 const obtenerTareas = async () => {
@@ -42,7 +45,7 @@ const obtenerTareas = async () => {
 
 const verTarea = async (id) => {
     // enviar consulta a la API para obtener la tarea con el id
-    alert('tera obtenida')
+    // alert('tarea obtenida')
     return {
         "_id": "4",
         "titulo": "caminata en las mañanas",
@@ -52,7 +55,7 @@ const verTarea = async (id) => {
     }
 }
 
-const editarTarea = async (id) => {
+const editarTarea = async (id, tareaEditada) => {
     // enviar consulta a la API para obtener la tarea con el id
     alert('tarea editada')
 }
@@ -67,6 +70,8 @@ const eliminarTarea = async (id) => {
 const listaTareas = document.getElementById('lista-tareas')
 const renderTareas = async () => {
     console.log("hola")
+
+    listaTareas.innerHTML = ''
 
     const listaTareasObtenidas = await obtenerTareas()
 
@@ -95,6 +100,73 @@ const renderTareas = async () => {
          listItem.appendChild(article)
 
          listaTareas.appendChild(listItem)
+
+         //------ botones ------
+         const wrapperBotones = document.createElement('div')
+         wrapperBotones.classList.add('wrapper-botones')
+
+         const buttonVerMas = document.createElement('button')
+         const buttonEditar = document.createElement('button')
+         const buttonEliminar = document.createElement('button')
+
+         buttonVerMas.innerText = 'ver mas'
+         buttonEditar.innerText = 'Editar'
+         buttonEliminar.innerText = 'Eliminar'
+
+         wrapperBotones.appendChild(buttonVerMas)
+         wrapperBotones.appendChild(buttonEditar)
+         wrapperBotones.appendChild(buttonEliminar)
+
+         article.appendChild(wrapperBotones)
+
+         //------agregar evento click al boton vermas ------
+         buttonVerMas.addEventListener('click', async () => {
+            // console.log(tarea._id)
+            const tareaObtenida = await verTarea(tarea._id)
+            //console.log(tareaObtenida)
+
+            const descripcion = document.createElement('p')
+            descripcion.innerText = `Descripción: ${tareaObtenida.descripcion}`
+            datos.appendChild(descripcion)
+
+            //desabilitar el boton
+            buttonVerMas.disabled = true
+
+         })
+
+         //------ agregar evento click al boton editar
+         buttonEditar.addEventListener('click', async () => {
+            //console.log(tarea._id)
+
+            const wrapperEditarTarea = document.getElementById('wrapper-form-editar')
+            wrapperEditarTarea.style.display = 'grid'
+
+            const tareaObtenida = await verTarea(tarea._id)
+
+            const inputEditarTitulo = document.getElementById('editar-titulo')
+            const inputEditarDescripcion = document.getElementById('editar-descripcion')
+            const inputEditarResponsable = document.getElementById('editar-responsable')
+            const inputEditarEstado = document.getElementById('editar-estado')
+
+            inputEditarTitulo.value = tareaObtenida.titulo
+            inputEditarDescripcion.value = tareaObtenida.descripcion
+            inputEditarResponsable.value = tareaObtenida.responsable
+            inputEditarEstado.value = tareaObtenida.estado
+
+            const formEditarTarea = document.getElementById('form-editar-tarea')
+            formEditarTarea.addEventListener('submit', async (event)=> {
+                event.preventDefault()
+
+                const data = object.fromEntries(new FormData(event.target))
+
+                await editarTarea(tarea._id, data)
+
+                renderTareas()
+
+            })
+
+         })
+
     })
 }
 
@@ -120,7 +192,21 @@ buttonCerrarFormEditar.addEventListener('click', () => {
 
 // -----------------------  Crear tarea -----------------------
 const formCrearTarea = document.getElementById('form-crear-tarea')
-formCrearTarea.addEventListener('submit', async (e) => {
+formCrearTarea.addEventListener('submit', async (event) => {
+    // prevenir el comportamiento por defecto del formulario
+    event.preventDefault()
+
+    //leer los datos del formulario
+    const data = Object.fromEntries(new FormData(Event.target))
+    console.log(data)
+
+    await crearTarea(data)
+
+    // ocultar formulario de crear tarea
+    wrapperFormCrear.style.display = 'none'
+
+    // es nesesario volver a renderizar las tareas
+    renderTareas()
 
 })
 
