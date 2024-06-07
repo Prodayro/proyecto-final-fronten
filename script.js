@@ -33,20 +33,33 @@ const crearTarea = async (tarea) => {
     // enviar consulta a la API para crear una tarea
     //alert('tarea creada')
 
-    tarea.estado = 'inactiva'
-    tareas.push(tarea)
+    await fetch('http://localhost:3000/api/v1/tareas',{
+        method: 'POST',
+        body: json.stringify(tarea)
+    })
+
+    /*tarea.estado = 'inactiva'
+    tareas.push(tarea)*/
 }
 
 const obtenerTareas = async () => {
     // enviar consulta a la API para obtener todas las tareas
+    const response = await fetch('http://localhost:3000/api/v1/tareas')
+    const data = await response.json()
 
-    return tareas
+    return data.data
+    //return tareas
 }
 
 const verTarea = async (id) => {
     // enviar consulta a la API para obtener la tarea con el id
     // alert('tarea obtenida')
-    const tareaEncontrada = tareas.find((tarea) => {
+    const response = await fetch('http://localhost:3000/api/v1/tareas/' + id) 
+    const data = await Response.json()
+
+    return data.data
+
+    /*const tareaEncontrada = tareas.find((tarea) => {
         if (id === tarea._id) {
             return true
         }
@@ -56,7 +69,7 @@ const verTarea = async (id) => {
         return tareaEncontrada
     } else {
         alert('tarea no encontrada')
-    }
+    }*/
 
 
    // return {
