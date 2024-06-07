@@ -1,4 +1,4 @@
-const tareas = [
+let tareas = [
     {
         "_id": "1",
         "titulo": "caminar",
@@ -46,24 +46,55 @@ const obtenerTareas = async () => {
 const verTarea = async (id) => {
     // enviar consulta a la API para obtener la tarea con el id
     // alert('tarea obtenida')
-    return {
-        "_id": "4",
-        "titulo": "caminata en las mañanas",
-        "descripcion": "salir a caminar en las mañanas",
-        "estado": "activa",
-        "responsable": "sebas"
+    const tareaEncontrada = tareas.find((tarea) => {
+        if (id === tarea._id) {
+            return true
+        }
+        return false
+    })
+    if (tareaEncontrada) {
+        return tareaEncontrada
+    } else {
+        alert('tarea no encontrada')
     }
+
+
+   // return {
+   //     "_id": "4",
+    //    "titulo": "caminata en las mañanas",
+    //    "descripcion": "salir a caminar en las mañanas",
+    //    "estado": "activa",
+   //     "responsable": "sebas"
+   // }
 }
 
 const editarTarea = async (id, tareaEditada) => {
     // enviar consulta a la API para obtener la tarea con el id
-    alert('tarea editada')
+    // alert('tarea editada')
+
+    const listaTareasModificadas = tareas.map((tarea) => {
+        if (id === tarea._id) {
+            tareaEditada._id = id
+           return tareaEditada 
+        }
+        return tarea
+    })
+
+    tareas = listaTareasModificadas
 }
 
 
 const eliminarTarea = async (id) => {
     // enviar consulta a la API para eliminar la tarea con el id
-    alert('tarea eliminada')
+    // alert('tarea eliminada')
+    const tareasFiltradas = tareas.filter((tarea) => {
+        if (tarea._id !== id) {
+            return true
+        }
+        return false
+    })
+
+    tareas = tareasFiltradas
 }
 
 // -----------------------  Renderizar tareas en el HTML -----------------------
@@ -157,14 +188,22 @@ const renderTareas = async () => {
             formEditarTarea.addEventListener('submit', async (event)=> {
                 event.preventDefault()
 
-                const data = object.fromEntries(new FormData(event.target))
+                const data = Object.fromEntries(new FormData(event.target))
 
                 await editarTarea(tarea._id, data)
+
+                wrapperEditarTarea.style.display = 'none'
 
                 renderTareas()
 
             })
 
+         })
+
+         // ------- agregar evento click al boton eliminar -------
+         buttonEliminar.addEventListener('click', async () => {
+            await eliminarTarea(tarea._id)
+            renderTareas()
          })
 
     })
