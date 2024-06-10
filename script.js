@@ -32,19 +32,28 @@ let tareas = [
 const crearTarea = async (tarea) => {
     // enviar consulta a la API para crear una tarea
     //alert('tarea creada')
-
+    console.log(tarea)
     await fetch('http://localhost:3000/api/v1/tareas',{
         method: 'POST',
-        body: json.stringify(tarea)
+        body: JSON.stringify(tarea),
+        Headers:{
+            'Content-Type': 'application/json'
+        }
     })
+}
 
     /*tarea.estado = 'inactiva'
     tareas.push(tarea)*/
-}
+
 
 const obtenerTareas = async () => {
     // enviar consulta a la API para obtener todas las tareas
-    const response = await fetch('http://localhost:3000/api/v1/tareas')
+
+    let query = ''
+    if (estado) {
+        query = '?estado=' + estado
+    }
+    const response = await fetch('http://localhost:3000/api/v1/tareas' + query)
     const data = await response.json()
 
     return data.data
@@ -85,13 +94,21 @@ const editarTarea = async (id, tareaEditada) => {
     // enviar consulta a la API para obtener la tarea con el id
     // alert('tarea editada')
 
-    const listaTareasModificadas = tareas.map((tarea) => {
+    await fetch('http://localhost:3000/api/v1/tareas/' + id, {
+        method: 'put',
+        body: JSON.stringify(tareaEditada),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+
+    /*const listaTareasModificadas = tareas.map((tarea) => {
         if (id === tarea._id) {
             tareaEditada._id = id
            return tareaEditada 
         }
         return tarea
-    })
+    })*/
 
     tareas = listaTareasModificadas
 }
@@ -100,12 +117,16 @@ const editarTarea = async (id, tareaEditada) => {
 const eliminarTarea = async (id) => {
     // enviar consulta a la API para eliminar la tarea con el id
     // alert('tarea eliminada')
-    const tareasFiltradas = tareas.filter((tarea) => {
+
+    await fetch('http://localhost:3000/api/v1/tarea/' + id, {
+        method: 'DELETE'
+    })
+    /*const tareasFiltradas = tareas.filter((tarea) => {
         if (tarea._id !== id) {
             return true
         }
         return false
-    })
+    })*/
 
     tareas = tareasFiltradas
 }
@@ -263,9 +284,13 @@ formCrearTarea.addEventListener('submit', async (event) => {
 })
 
 // -----------------------  Filtrar tareas por estado -----------------------
-let estado = ''
+
 const selectEstado = document.getElementById('select-estado')
 selectEstado.addEventListener('change', (e) => {
+    console.log(e.target.value)
+    estado = e.target.value
+
+    renderTareas()
 })
 
 window.addEventListener('load', renderTareas)
